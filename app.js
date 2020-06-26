@@ -43,9 +43,7 @@ const catchErrorMIddleware = ((err, req, res, next) => {
     console.error(err);
     return res.status(err.status).send({ status: err.status, message: err.message });
   }
-  // if (err.status(500)) {
-  //     return res.status(500).send({ message: err.message });
-  // }
+
   return next();
 });
 
