@@ -17,6 +17,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,
+  useUnifiedTopology: true,
 });
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -34,21 +35,25 @@ app.use(auth);
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
 
+// ошибка при неправильном адресе в строке
 app.use('*', (req, res) => {
   res.status(404).json({ message: 'Запрашиваемый ресурс не найден' });
 });
 
-const catchErrorMIddleware = ((err, req, res, next) => {
-  if (err instanceof SyntaxError) {
-    console.error(err);
-    return res.status(err.status).send({ status: err.status, message: err.message });
-  }
+// централизованный обработчик ошибок
 
-  return next();
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  const { statusCode = 500, message } = err;
+  res
+    .status(statusCode)
+    .send({
+      message: statusCode === 500
+        ? err.message : message,
+    });
 });
 
-app.use(catchErrorMIddleware);
-
 app.listen(PORT, () => {
+  // eslint-disable-next-line no-console
   console.log(`App listening on port ${PORT}`);
 });
