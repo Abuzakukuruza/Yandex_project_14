@@ -11,16 +11,28 @@ module.exports.getUsers = (req, res) => {
     .then((user) => {
       res.send({ data: user });
     })
-    .catch(() => res.status(400).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        res.status(400).send({ message: err.message })
+      } else {
+        next(err);
+      }
+    });
 };
 
-module.exports.getUserById = (req, res) => {
+module.exports.getUserById = (req, res, next) => {
   User.findById(req.params.id)
     .orFail(() => new NotFoundError('Нет пользователя с таким id'))
     .then((user) => {
       res.send({ data: user });
     })
-    .catch(() => res.status(400).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if (err.name === "CastError") {
+        res.status(400).send({ message: err.message })
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports.createUser = (req, res) => {
@@ -43,7 +55,7 @@ module.exports.createUser = (req, res) => {
       res.send(user.omitPrivate({ data: user }));
       // res.send({ data: user });
     })
-    .catch(() => res.status(400).send({ message: 'Произошла ошибка' }));
+    .catch((err) => res.status(401).send({ message: err.message }));
 };
 
 // обновление профиля пользователя
@@ -57,7 +69,13 @@ module.exports.updateUserProfile = (req, res) => {
     .then((user) => {
       res.send({ data: user });
     })
-    .catch(() => res.status(400).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        res.status(400).send({ message: err.message })
+      } else {
+        next(err);
+      }
+    });
 };
 
 // обновление аватара пользователя
@@ -71,7 +89,13 @@ module.exports.updateUserAvatar = (req, res) => {
     .then((user) => {
       res.send({ data: user });
     })
-    .catch(() => res.status(400).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        res.status(400).send({ message: err.message })
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports.login = (req, res) => {
@@ -85,5 +109,5 @@ module.exports.login = (req, res) => {
           httpOnly: true,
         }));
     })
-    .catch(() => res.status(400).send({ message: 'Произошла ошибка' }));
+    .catch((err) => res.status(401).send({ message: err.message }));
 };
