@@ -44,11 +44,11 @@ app.use('*', (req, res) => {
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
+  const { statusCode = 400, message } = err;
   res
     .status(statusCode)
     .send({
-      message: statusCode === 500
+      message: statusCode === 400
         ? err.message : message,
     });
 });

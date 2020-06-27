@@ -40,9 +40,6 @@ module.exports.createUser = (req, res, next) => {
     }))
 
     .then((user) => {
-      if (!user) {
-        throw new BadRequestError('Ошибка при отправке запроса');
-      }
       res.send(user.omitPrivate({ data: user }));
       // res.send({ data: user });
     })

@@ -6,7 +6,7 @@ const AuthError = require('../errors/auth-err');
 // eslint-disable-next-line consistent-return
 module.exports = (req, res, next) => {
   const { authorization = '' } = req.headers;
-  if (authorization || authorization.startsWith('Bearer')) {
+  if (authorization && authorization.startsWith('Bearer')) {
     const token = authorization.replace('Bearer ', '');
     let payload;
     try {
@@ -15,6 +15,8 @@ module.exports = (req, res, next) => {
       return next(new AuthError('Неправильный email или пароль'));
     }
     req.user = payload;
+  } else {
+    return res.status(401).send({ message: 'Необходима авторизация' });
   }
   next();
 };
