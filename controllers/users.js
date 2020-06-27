@@ -6,24 +6,24 @@ const BadRequestError = require('../errors/bad-request-err');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
-module.exports.getUsers = (req, res, next) => {
+module.exports.getUsers = (req, res) => {
   User.find({})
     .then((user) => {
       res.send({ data: user });
     })
-    .catch(next);
+    .catch(() => res.status(400).send({ message: 'Произошла ошибка' }));
 };
 
-module.exports.getUserById = (req, res, next) => {
+module.exports.getUserById = (req, res) => {
   User.findById(req.params.id)
     .orFail(() => new NotFoundError('Нет пользователя с таким id'))
     .then((user) => {
       res.send({ data: user });
     })
-    .catch(next);
+    .catch(() => res.status(400).send({ message: 'Произошла ошибка' }));
 };
 
-module.exports.createUser = (req, res, next) => {
+module.exports.createUser = (req, res) => {
   const {
     name,
     about,
@@ -43,11 +43,11 @@ module.exports.createUser = (req, res, next) => {
       res.send(user.omitPrivate({ data: user }));
       // res.send({ data: user });
     })
-    .catch(next);
+    .catch(() => res.status(400).send({ message: 'Произошла ошибка' }));
 };
 
 // обновление профиля пользователя
-module.exports.updateUserProfile = (req, res, next) => {
+module.exports.updateUserProfile = (req, res) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, {
     new: true, // обработчик then получит на вход обновлённую запись
@@ -57,11 +57,11 @@ module.exports.updateUserProfile = (req, res, next) => {
     .then((user) => {
       res.send({ data: user });
     })
-    .catch(next);
+    .catch(() => res.status(400).send({ message: 'Произошла ошибка' }));
 };
 
 // обновление аватара пользователя
-module.exports.updateUserAvatar = (req, res, next) => {
+module.exports.updateUserAvatar = (req, res) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(req.user._id, { avatar }, {
     new: true, // обработчик then получит на вход обновлённую запись
@@ -71,10 +71,10 @@ module.exports.updateUserAvatar = (req, res, next) => {
     .then((user) => {
       res.send({ data: user });
     })
-    .catch(next);
+    .catch(() => res.status(400).send({ message: 'Произошла ошибка' }));
 };
 
-module.exports.login = (req, res, next) => {
+module.exports.login = (req, res) => {
   const { email, password } = req.body;
   return User.findUser(email, password)
     .then((user) => {
@@ -85,5 +85,5 @@ module.exports.login = (req, res, next) => {
           httpOnly: true,
         }));
     })
-    .catch(next);
+    .catch(() => res.status(400).send({ message: 'Произошла ошибка' }));
 };
