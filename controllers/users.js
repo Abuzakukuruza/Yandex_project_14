@@ -26,7 +26,7 @@ module.exports.getUserById = (req, res, next) => {
       res.send({ data: user });
     })
     .catch((err) => {
-      if (err.name == 'CastError') {
+      if (err.name === 'CastError') {
         res.status(400).send({ message: 'Не верно указан id!' });
       } else {
         next(err);
@@ -59,6 +59,8 @@ module.exports.createUser = (req, res, next) => {
         res.status(400).send({ message: 'Необходимо ввести пароль!' });
       } else if (err.name === 'MongoError' && err.code === 11000) {
         res.status(409).send({ message: 'Такая почта уже существует!' });
+      } else if (err.name === 'ValidationError') {
+        res.status(400).send({ message: err.message });
       } else {
         next(err);
       }
@@ -105,7 +107,7 @@ module.exports.updateUserAvatar = (req, res, next) => {
     });
 };
 
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUser(email, password)
     .then((user) => {
@@ -117,11 +119,10 @@ module.exports.login = (req, res) => {
         }));
     })
     .catch((err) => {
-      const { password } = req.body;
       if (password === undefined) {
         res.status(400).send({ message: 'Необходимо ввести пароль!' });
       } else {
         next(err);
       }
-    });;
+    });
 };
